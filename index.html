@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DC Labor Planning Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f5f0;
+    --accent: #e8ff00;
+    --accent2: #00d4ff;
+    --red: #ff3b3b;
+    --orange: #ff8c00;
+    --green: #00e676;
+    --gray1: #1a1a1a;
+    --gray2: #2a2a2a;
+    --gray3: #3a3a3a;
+    --gray4: #555;
+    --gray5: #888;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* HEADER */
+  header {
+    background: var(--gray1);
+    border-bottom: 3px solid var(--accent);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--white); }
+  .header-meta {
+    font-size: 0.75rem;
+    color: var(--gray5);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--gray1);
+    border-bottom: 1px solid var(--gray3);
+    padding: 0 2rem;
+    gap: 0;
+  }
+  .tab {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: var(--gray5);
+    transition: all 0.15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .tab:hover { color: var(--white); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* MAIN LAYOUT */
+  main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--gray3);
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+
+  /* CARDS */
+  .card {
+    background: var(--gray1);
+    border: 1px solid var(--gray3);
+    border-radius: 4px;
+    padding: 1.25rem;
+  }
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray5);
+    margin-bottom: 0.75rem;
+  }
+
+  /* KPI TILES */
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .kpi {
+    background: var(--gray1);
+    border: 1px solid var(--gray3);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi.good::before { background: var(--green); }
+  .kpi.warn::before { background: var(--orange); }
+  .kpi.bad::before { background: var(--red); }
+  .kpi.info::before { background: var(--accent2); }
+  .kpi.neutral::before { background: var(--accent); }
+  .kpi-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray5);
+    margin-bottom: 0.4rem;
+  }
+  .kpi-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--white);
+  }
+  .kpi-value.good { color: var(--green); }
+  .kpi-value.warn { color: var(--orange); }
+  .kpi-value.bad { color: var(--red); }
+  .kpi-sub {
+    font-size: 0.7rem;
+    color: var(--gray5);
+    margin-top: 0.25rem;
+  }
+
+  /* FORM ELEMENTS */
+  label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray5);
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+  }
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    background: var(--gray2);
+    border: 1px solid var(--gray3);
+    color: var(--white);
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+    font-family: 'Barlow', sans-serif;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="number"]:focus, input[type="text"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  select option { background: var(--gray2); }
+  .form-row { margin-bottom: 0.85rem; }
+  .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .form-group-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: var(--black); }
+  .btn-primary:hover { background: #d4eb00; }
+  .btn-secondary { background: var(--gray3); color: var(--white); }
+  .btn-secondary:hover { background: var(--gray4); }
+  .btn-danger { background: var(--red); color: var(--white); }
+  .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .data-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray5);
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gray3);
+    background: var(--gray2);
+  }
+  .data-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--gray2);
+    color: var(--white);
+  }
+  .data-table tr:hover td { background: var(--gray2); }
+  .status-badge {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+  }
+  .badge-green { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-orange { background: rgba(255,140,0,0.15); color: var(--orange); }
+  .badge-red { background: rgba(255,59,59,0.15); color: var(--red); }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+  .bar-row { display: flex; align-items: center; gap: 0.75rem; }
+  .bar-label { font-size: 0.75rem; color: var(--gray5); width: 90px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--gray2); border-radius: 2px; height: 22px; position: relative; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+  }
+  .bar-fill span { font-size: 0.7rem; font-weight: 600; color: var(--black); white-space: nowrap; }
+  .bar-val { font-size: 0.75rem; color: var(--white); width: 60px; flex-shrink: 0; font-weight: 600; }
+
+  /* UTILIZATION METER */
+  .util-meter { margin-top: 0.5rem; }
+  .util-track {
+    height: 32px;
+    background: var(--gray2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 0.4rem;
+  }
+  .util-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+  }
+  .util-fill span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    color: var(--black);
+  }
+  .util-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--gray5); }
+
+  /* ALERT BANNER */
+  .alert {
+    padding: 0.6rem 1rem;
+    border-radius: 3px;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .alert-red { background: rgba(255,59,59,0.1); border-left: 3px solid var(--red); color: var(--red); }
+  .alert-orange { background: rgba(255,140,0,0.1); border-left: 3px solid var(--orange); color: var(--orange); }
+  .alert-green { background: rgba(0,230,118,0.1); border-left: 3px solid var(--green); color: var(--green); }
+
+  /* WEEKLY GRID */
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-top: 0.75rem; }
+  .day-card {
+    background: var(--gray2);
+    border: 1px solid var(--gray3);
+    border-radius: 3px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+  }
+  .day-name {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray5);
+    margin-bottom: 0.4rem;
+  }
+  .day-vol {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--white);
+    line-height: 1;
+  }
+  .day-hc {
+    font-size: 0.7rem;
+    color: var(--accent2);
+    margin-top: 0.3rem;
+  }
+  .day-status { margin-top: 0.4rem; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--gray3); margin: 1.5rem 0; }
+
+  /* PROCESS PATH TABLE INPUT */
+  .path-table { width: 100%; border-collapse: collapse; }
+  .path-table th {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gray5); padding: 0.4rem 0.5rem; text-align: left;
+    background: var(--gray2); border-bottom: 1px solid var(--gray3);
+  }
+  .path-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--gray2); }
+  .path-table input { padding: 0.3rem 0.5rem; font-size: 0.85rem; }
+  .path-table .result-cell {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  /* COST TABLE */
+  .cost-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--gray2); font-size: 0.85rem; }
+  .cost-row:last-child { border-bottom: none; }
+  .cost-label { color: var(--gray5); }
+  .cost-value { font-weight: 600; }
+  .cost-total { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--gray1); }
+  ::-webkit-scrollbar-thumb { background: var(--gray3); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .col-span-2, .col-span-3 { grid-column: span 1; }
+    .week-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DC Labor<span> Planner</span></div>
+  <div class="header-meta">Distribution Center · Productivity Planning Tool</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab" onclick="switchTab('shift')">Shift Planning</button>
+  <button class="tab" onclick="switchTab('weekly')">Weekly Forecast</button>
+  <button class="tab" onclick="switchTab('capacity')">Capacity Model</button>
+  <button class="tab" onclick="switchTab('budget')">Budget & Cost</button>
+</div>
+
+<main>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="panel-dashboard" class="panel active">
+    <div class="kpi-grid" id="kpi-grid">
+      <!-- populated by JS -->
+    </div>
+    <div id="alert-zone" style="margin-bottom:1.5rem;"></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Weekly Volume by Day</div>
+        <div class="bar-chart" id="weekly-bar-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Process Path Utilization</div>
+        <div class="bar-chart" id="path-bar-chart"></div>
+      </div>
+      <div class="card col-span-2">
+        <div class="card-title">Headcount vs. Required — This Week</div>
+        <div class="week-grid" id="week-summary-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SHIFT PLANNING ===== -->
+  <div id="panel-shift" class="panel">
+    <div class="grid-2">
+      <div>
+        <div class="section-title">Shift Configuration</div>
+        <div class="card">
+          <div class="form-row">
+            <label>Number of Shifts per Day</label>
+            <select id="num-shifts" onchange="calcShift()">
+              <option value="1">1 Shift</option>
+              <option value="2" selected>2 Shifts</option>
+              <option value="3">3 Shifts</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Hours per Shift</label>
+            <input type="number" id="shift-hours" value="10" min="4" max="12" onchange="calcShift()"/>
+          </div>
+          <div class="form-row">
+            <label>Break/Non-Productive Time (min per shift)</label>
+            <input type="number" id="break-time" value="30" min="0" max="90" onchange="calcShift()"/>
+          </div>
+          <div class="form-row">
+            <label>Target Utilization Rate (%)</label>
+            <input type="number" id="target-util" value="85" min="50" max="100" onchange="calcShift()"/>
+          </div>
+          <div class="form-row">
+            <label>Daily Volume Target (units)</label>
+            <input type="number" id="daily-volume" value="25000" min="0" onchange="calcShift()"/>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:1.5rem;">Process Paths</div>
+        <div class="card">
+          <table class="path-table" id="path-table">
+            <thead>
+              <tr>
+                <th>Process Path</th>
+                <th>% of Volume</th>
+                <th>Units/Hr/Person</th>
+                <th>Req. HC</th>
+              </tr>
+            </thead>
+            <tbody id="path-tbody"></tbody>
+          </table>
+          <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+            <button class="btn btn-secondary btn-sm" onclick="addPath()">+ Add Path</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Shift Results</div>
+        <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;" id="shift-kpis"></div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Productive Hours Available per Shift</div>
+          <div class="util-meter">
+            <div class="util-track">
+              <div class="util-fill" id="util-bar" style="width:0%; background: var(--green);">
+                <span id="util-pct">0%</span>
+              </div>
+            </div>
+            <div class="util-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Headcount Requirements by Path</div>
+          <div class="bar-chart" id="shift-path-bars"></div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Shift Alerts</div>
+          <div id="shift-alerts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WEEKLY FORECAST ===== -->
+  <div id="panel-weekly" class="panel">
+    <div class="grid-2">
+      <div>
+        <div class="section-title">Weekly Volume Forecast</div>
+        <div class="card">
+          <div id="daily-inputs"></div>
+          <div style="margin-top:1rem;">
+            <label>Productivity Rate (units/hr/person) — All Days</label>
+            <input type="number" id="weekly-prod-rate" value="50" min="1" onchange="calcWeekly()"/>
+          </div>
+          <div class="form-row" style="margin-top:0.75rem;">
+            <label>Shift Hours per Day</label>
+            <input type="number" id="weekly-shift-hrs" value="10" min="1" onchange="calcWeekly()"/>
+          </div>
+          <div class="form-row">
+            <label>Shifts per Day</label>
+            <select id="weekly-shifts" onchange="calcWeekly()">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Weekly Summary</div>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr;" id="weekly-kpis"></div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Daily Volume & Required Headcount</div>
+          <table class="data-table" id="weekly-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Volume</th>
+                <th>Req. HC</th>
+                <th>Planned HC</th>
+                <th>Delta</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="weekly-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAPACITY MODEL ===== -->
+  <div id="panel-capacity" class="panel">
+    <div class="grid-2">
+      <div>
+        <div class="section-title">DC Capacity Parameters</div>
+        <div class="card">
+          <div class="form-group">
+            <div class="form-row">
+              <label>Total DC Floor Space (sq ft)</label>
+              <input type="number" id="dc-sqft" value="500000" onchange="calcCapacity()"/>
+            </div>
+            <div class="form-row">
+              <label>Active Workstation Count</label>
+              <input type="number" id="dc-stations" value="200" onchange="calcCapacity()"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <label>Max Associates on Floor</label>
+              <input type="number" id="dc-max-hc" value="300" onchange="calcCapacity()"/>
+            </div>
+            <div class="form-row">
+              <label>Current Active Associates</label>
+              <input type="number" id="dc-current-hc" value="245" onchange="calcCapacity()"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <label>Peak Season Volume (units/day)</label>
+              <input type="number" id="dc-peak-vol" value="40000" onchange="calcCapacity()"/>
+            </div>
+            <div class="form-row">
+              <label>Standard Volume (units/day)</label>
+              <input type="number" id="dc-std-vol" value="25000" onchange="calcCapacity()"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <label>Units per Hour per Associate</label>
+              <input type="number" id="dc-uph" value="50" onchange="calcCapacity()"/>
+            </div>
+            <div class="form-row">
+              <label>Productive Hours per Shift</label>
+              <input type="number" id="dc-prod-hrs" value="9.5" step="0.5" onchange="calcCapacity()"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Number of Shifts</label>
+            <select id="dc-shifts" onchange="calcCapacity()">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:1.5rem;">Brand / Channel Volume Split</div>
+        <div class="card">
+          <table class="path-table" id="channel-table">
+            <thead><tr><th>Channel / Brand</th><th>% of Volume</th><th>Daily Units</th></tr></thead>
+            <tbody id="channel-tbody"></tbody>
+          </table>
+          <button class="btn btn-secondary btn-sm" style="margin-top:0.75rem;" onclick="addChannel()">+ Add Channel</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Capacity Analysis</div>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr;" id="cap-kpis"></div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Capacity Utilization — Standard vs Peak</div>
+          <div style="margin-bottom:0.75rem;">
+            <div style="font-size:0.75rem;color:var(--gray5);margin-bottom:0.3rem;">Standard Volume</div>
+            <div class="util-track">
+              <div class="util-fill" id="std-util-bar" style="width:0%;"><span id="std-util-pct">0%</span></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--gray5);margin-bottom:0.3rem;">Peak Volume</div>
+            <div class="util-track">
+              <div class="util-fill" id="peak-util-bar" style="width:0%;"><span id="peak-util-pct">0%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Channel Volume Distribution</div>
+          <div class="bar-chart" id="channel-bars"></div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Capacity Alerts</div>
+          <div id="cap-alerts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BUDGET & COST ===== -->
+  <div id="panel-budget" class="panel">
+    <div class="grid-2">
+      <div>
+        <div class="section-title">Labor Cost Inputs</div>
+        <div class="card">
+          <div class="form-group">
+            <div class="form-row">
+              <label>Avg Hourly Rate — Associates ($)</label>
+              <input type="number" id="b-assoc-rate" value="18.50" step="0.25" onchange="calcBudget()"/>
+            </div>
+            <div class="form-row">
+              <label>Avg Hourly Rate — Managers ($)</label>
+              <input type="number" id="b-mgr-rate" value="28.00" step="0.25" onchange="calcBudget()"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <label>Number of Associates</label>
+              <input type="number" id="b-assoc-count" value="200" onchange="calcBudget()"/>
+            </div>
+            <div class="form-row">
+              <label>Number of Managers</label>
+              <input type="number" id="b-mgr-count" value="20" onchange="calcBudget()"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <label>Shift Hours per Day</label>
+              <input type="number" id="b-shift-hrs" value="10" onchange="calcBudget()"/>
+            </div>
+            <div class="form-row">
+              <label>Operating Days per Week</label>
+              <input type="number" id="b-op-days" value="6" min="1" max="7" onchange="calcBudget()"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Overtime Rate Multiplier</label>
+            <select id="b-ot-mult" onchange="calcBudget()">
+              <option value="1.5" selected>1.5x</option>
+              <option value="2.0">2.0x</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Estimated OT Hours per Person per Week</label>
+            <input type="number" id="b-ot-hrs" value="2" step="0.5" min="0" onchange="calcBudget()"/>
+          </div>
+          <div class="form-row">
+            <label>Benefits Load (%)</label>
+            <input type="number" id="b-benefits" value="28" min="0" max="60" onchange="calcBudget()"/>
+          </div>
+          <div class="form-row">
+            <label>Annual Budget (enter to compare) ($)</label>
+            <input type="number" id="b-annual-budget" value="18000000" onchange="calcBudget()"/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Cost Summary</div>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr;" id="budget-kpis"></div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Weekly Cost Breakdown</div>
+          <div id="cost-breakdown"></div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Annual Projection vs Budget</div>
+          <div class="util-meter">
+            <div class="util-track">
+              <div class="util-fill" id="budget-bar" style="width:0%;"><span id="budget-bar-pct">0%</span></div>
+            </div>
+            <div class="util-labels"><span>$0</span><span id="budget-mid-label">—</span><span id="budget-max-label">—</span></div>
+          </div>
+          <div id="budget-alerts" style="margin-top:1rem;"></div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div class="card-title">Cost per Unit (at current volume)</div>
+          <div id="cpu-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2.5rem;color:var(--accent);"></div>
+          <div style="font-size:0.75rem;color:var(--gray5);margin-top:0.3rem;">Based on daily volume from Shift Planning tab</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============ STATE ============
+const state = {
+  paths: [
+    { name: 'Receiving', pct: 15, uph: 60 },
+    { name: 'Put-Away', pct: 20, uph: 45 },
+    { name: 'Picking', pct: 30, uph: 55 },
+    { name: 'Packing', pct: 20, uph: 50 },
+    { name: 'Shipping', pct: 15, uph: 70 },
+  ],
+  weekly: [
+    { day: 'Mon', vol: 22000, planned: 130 },
+    { day: 'Tue', vol: 25000, planned: 145 },
+    { day: 'Wed', vol: 28000, planned: 160 },
+    { day: 'Thu', vol: 30000, planned: 170 },
+    { day: 'Fri', vol: 26000, planned: 150 },
+    { day: 'Sat', vol: 18000, planned: 110 },
+    { day: 'Sun', vol: 0, planned: 0 },
+  ],
+  channels: [
+    { name: 'Wholesale', pct: 40 },
+    { name: 'DTC / E-Commerce', pct: 35 },
+    { name: 'Retail Stores', pct: 20 },
+    { name: 'Outlet', pct: 5 },
+  ]
+};
+
+// ============ TABS ============
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ============ HELPERS ============
+function fmt(n, decimals=0) {
+  if (isNaN(n) || !isFinite(n)) return '—';
+  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function fmtDollar(n, decimals=0) {
+  if (isNaN(n) || !isFinite(n)) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function statusBadge(delta) {
+  if (delta >= 0 && delta <= 10) return `<span class="status-badge badge-green">On Plan</span>`;
+  if (delta > 10) return `<span class="status-badge badge-orange">Overstaffed +${delta}</span>`;
+  return `<span class="status-badge badge-red">Understaffed ${delta}</span>`;
+}
+function barColor(pct) {
+  if (pct <= 85) return 'var(--green)';
+  if (pct <= 100) return 'var(--orange)';
+  return 'var(--red)';
+}
+function kpiHtml(label, value, cls, sub='') {
+  return `<div class="kpi ${cls}">
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-value ${cls === 'good' ? 'good' : cls === 'warn' ? 'warn' : cls === 'bad' ? 'bad' : ''}">${value}</div>
+    ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+  </div>`;
+}
+function alertHtml(msg, type) {
+  const icons = { red: '⚠', orange: '⚡', green: '✓' };
+  return `<div class="alert alert-${type}">${icons[type]} ${msg}</div>`;
+}
+
+// ============ SHIFT PLANNING ============
+function buildPathTable() {
+  const tbody = document.getElementById('path-tbody');
+  tbody.innerHTML = '';
+  state.paths.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${p.name}" onchange="state.paths[${i}].name=this.value; calcShift();" style="width:100%;"/></td>
+      <td><input type="number" value="${p.pct}" min="0" max="100" onchange="state.paths[${i}].pct=+this.value; calcShift();" style="width:70px;"/></td>
+      <td><input type="number" value="${p.uph}" min="1" onchange="state.paths[${i}].uph=+this.value; calcShift();" style="width:70px;"/></td>
+      <td class="result-cell" id="path-req-${i}">—</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addPath() {
+  state.paths.push({ name: 'New Path', pct: 0, uph: 50 });
+  buildPathTable();
+  calcShift();
+}
+
+function calcShift() {
+  const numShifts = +document.getElementById('num-shifts').value;
+  const shiftHrs = +document.getElementById('shift-hours').value;
+  const breakMin = +document.getElementById('break-time').value;
+  const targetUtil = +document.getElementById('target-util').value / 100;
+  const dailyVol = +document.getElementById('daily-volume').value;
+
+  const prodHrs = shiftHrs - (breakMin / 60);
+  const effHrs = prodHrs * targetUtil;
+  const utilPct = clamp((prodHrs / shiftHrs) * 100, 0, 100);
+
+  // Total daily productive person-hours needed
+  const avgUph = state.paths.reduce((s, p) => s + (p.pct / 100) * p.uph, 0);
+  const totalHCPerShift = avgUph > 0 ? Math.ceil((dailyVol / numShifts) / (effHrs * avgUph)) : 0;
+  const totalHCDaily = totalHCPerShift * numShifts;
+
+  // Per-path
+  const pathBars = [];
+  state.paths.forEach((p, i) => {
+    const pathVol = (p.pct / 100) * dailyVol / numShifts;
+    const hc = p.uph > 0 ? Math.ceil(pathVol / (effHrs * p.uph)) : 0;
+    const el = document.getElementById(`path-req-${i}`);
+    if (el) el.textContent = hc;
+    pathBars.push({ label: p.name, val: hc, max: totalHCPerShift || 1 });
+  });
+
+  // KPIs
+  const kpiEl = document.getElementById('shift-kpis');
+  kpiEl.innerHTML =
+    kpiHtml('HC / Shift', fmt(totalHCPerShift), 'info') +
+    kpiHtml('Total Daily HC', fmt(totalHCDaily), 'neutral') +
+    kpiHtml('Productive Hrs/Shift', fmt(prodHrs, 1), 'info') +
+    kpiHtml('Avg UPH', fmt(avgUph, 1), 'info');
+
+  // Util bar
+  const ub = document.getElementById('util-bar');
+  const up = document.getElementById('util-pct');
+  const pct = clamp(Math.round(utilPct), 0, 100);
+  ub.style.width = pct + '%';
+  ub.style.background = barColor(pct);
+  up.textContent = pct + '%';
+
+  // Path bars
+  renderBars('shift-path-bars', pathBars.map(b => ({
+    label: b.label,
+    val: b.val,
+    pct: clamp(Math.round((b.val / (totalHCPerShift || 1)) * 100), 0, 100),
+    display: b.val + ' HC'
+  })));
+
+  // Alerts
+  let alertsHtml = '';
+  if (totalHCPerShift > 200) alertsHtml += alertHtml(`High headcount per shift (${totalHCPerShift}) — verify station capacity.`, 'orange');
+  if (prodHrs < 8) alertsHtml += alertHtml('Productive hours below 8/shift — consider adjusting break schedule.', 'orange');
+  if (state.paths.reduce((s, p) => s + p.pct, 0) !== 100) alertsHtml += alertHtml('Process path volume percentages do not sum to 100%.', 'red');
+  if (!alertsHtml) alertsHtml = alertHtml('All shift parameters look good.', 'green');
+  document.getElementById('shift-alerts').innerHTML = alertsHtml;
+
+  updateDashboard();
+}
+
+// ============ WEEKLY FORECAST ============
+function buildWeeklyInputs() {
+  const div = document.getElementById('daily-inputs');
+  div.innerHTML = '<div class="form-group-3">' +
+    state.weekly.map((d, i) => `
+      <div class="form-row">
+        <label>${d.day} — Volume</label>
+        <input type="number" value="${d.vol}" min="0" onchange="state.weekly[${i}].vol=+this.value; calcWeekly();" />
+      </div>
+    `).join('') +
+    '</div>' +
+    '<div class="form-group-3" style="margin-top:0.5rem;">' +
+    state.weekly.map((d, i) => `
+      <div class="form-row">
+        <label>${d.day} — Planned HC</label>
+        <input type="number" value="${d.planned}" min="0" onchange="state.weekly[${i}].planned=+this.value; calcWeekly();" />
+      </div>
+    `).join('') +
+    '</div>';
+}
+
+function calcWeekly() {
+  const prodRate = +document.getElementById('weekly-prod-rate').value;
+  const shiftHrs = +document.getElementById('weekly-shift-hrs').value;
+  const numShifts = +document.getElementById('weekly-shifts').value;
+  const prodHrsPerDay = shiftHrs * numShifts * 0.9; // 90% efficiency
+
+  const tbody = document.getElementById('weekly-tbody');
+  tbody.innerHTML = '';
+  let totalVol = 0, totalRequired = 0, totalPlanned = 0;
+
+  state.weekly.forEach(d => {
+    const required = d.vol > 0 ? Math.ceil(d.vol / (prodRate * prodHrsPerDay)) : 0;
+    const delta = d.planned - required;
+    totalVol += d.vol;
+    totalRequired += required;
+    totalPlanned += d.planned;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:600">${d.day}</td>
+      <td>${fmt(d.vol)}</td>
+      <td>${fmt(required)}</td>
+      <td>${fmt(d.planned)}</td>
+      <td style="color:${delta >= 0 ? 'var(--green)' : 'var(--red)'}">${delta >= 0 ? '+' : ''}${delta}</td>
+      <td>${d.vol === 0 ? '<span class="status-badge badge-orange">Dark Day</span>' : statusBadge(delta)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const avgUtil = totalPlanned > 0 ? Math.round((totalRequired / totalPlanned) * 100) : 0;
+  const kpiEl = document.getElementById('weekly-kpis');
+  kpiEl.innerHTML =
+    kpiHtml('Weekly Volume', fmt(totalVol), 'neutral') +
+    kpiHtml('Avg Daily Vol', fmt(Math.round(totalVol / 6)), 'info') +
+    kpiHtml('Total Req HC-Days', fmt(totalRequired), 'info') +
+    kpiHtml('HC Utilization', avgUtil + '%', avgUtil > 100 ? 'bad' : avgUtil > 85 ? 'good' : 'warn');
+
+  updateDashboard();
+}
+
+// ============ CAPACITY MODEL ============
+function buildChannelTable() {
+  const tbody = document.getElementById('channel-tbody');
+  tbody.innerHTML = '';
+  const stdVol = +document.getElementById('dc-std-vol')?.value || 25000;
+  state.channels.forEach((c, i) => {
+    const units = Math.round((c.pct / 100) * stdVol);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${c.name}" onchange="state.channels[${i}].name=this.value; calcCapacity();" style="width:100%;"/></td>
+      <td><input type="number" value="${c.pct}" min="0" max="100" onchange="state.channels[${i}].pct=+this.value; calcCapacity();" style="width:70px;"/></td>
+      <td style="font-weight:600;color:var(--accent2);">${fmt(units)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addChannel() {
+  state.channels.push({ name: 'New Channel', pct: 0 });
+  buildChannelTable();
+  calcCapacity();
+}
+
+function calcCapacity() {
+  buildChannelTable();
+  const maxHC = +document.getElementById('dc-max-hc').value;
+  const currentHC = +document.getElementById('dc-current-hc').value;
+  const peakVol = +document.getElementById('dc-peak-vol').value;
+  const stdVol = +document.getElementById('dc-std-vol').value;
+  const uph = +document.getElementById('dc-uph').value;
+  const prodHrs = +document.getElementById('dc-prod-hrs').value;
+  const shifts = +document.getElementById('dc-shifts').value;
+
+  const dailyCap = maxHC * uph * prodHrs * shifts;
+  const stdUtil = clamp(Math.round((stdVol / dailyCap) * 100), 0, 120);
+  const peakUtil = clamp(Math.round((peakVol / dailyCap) * 100), 0, 120);
+  const stdHCReq = Math.ceil(stdVol / (uph * prodHrs * shifts));
+  const peakHCReq = Math.ceil(peakVol / (uph * prodHrs * shifts));
+  const hcUtilPct = clamp(Math.round((currentHC / maxHC) * 100), 0, 100);
+
+  const kpiEl = document.getElementById('cap-kpis');
+  kpiEl.innerHTML =
+    kpiHtml('Daily Throughput Cap', fmt(dailyCap), 'neutral', 'units/day') +
+    kpiHtml('Std HC Required', fmt(stdHCReq), 'info') +
+    kpiHtml('Peak HC Required', fmt(peakHCReq), peakHCReq > maxHC ? 'bad' : 'warn') +
+    kpiHtml('HC Utilization', hcUtilPct + '%', hcUtilPct > 95 ? 'bad' : hcUtilPct > 80 ? 'good' : 'warn');
+
+  // Util bars
+  setUtilBar('std-util-bar', 'std-util-pct', stdUtil);
+  setUtilBar('peak-util-bar', 'peak-util-pct', peakUtil);
+
+  // Channel bars
+  const chBars = state.channels.map(c => ({
+    label: c.name,
+    val: Math.round((c.pct / 100) * stdVol),
+    pct: c.pct,
+    display: fmt(Math.round((c.pct / 100) * stdVol))
+  }));
+  renderBars('channel-bars', chBars);
+
+  // Alerts
+  let alertsHtml = '';
+  if (peakHCReq > maxHC) alertsHtml += alertHtml(`Peak requires ${peakHCReq} HC — exceeds max capacity of ${maxHC}. Consider temp staffing or extended shifts.`, 'red');
+  if (stdUtil > 90) alertsHtml += alertHtml(`Standard utilization at ${stdUtil}% — limited buffer for volume spikes.`, 'orange');
+  if (state.channels.reduce((s, c) => s + c.pct, 0) !== 100) alertsHtml += alertHtml('Channel volume percentages do not sum to 100%.', 'red');
+  if (currentHC < stdHCReq) alertsHtml += alertHtml(`Current HC (${currentHC}) is below required for standard volume (${stdHCReq}).`, 'red');
+  if (!alertsHtml) alertsHtml = alertHtml('Capacity parameters within acceptable thresholds.', 'green');
+  document.getElementById('cap-alerts').innerHTML = alertsHtml;
+
+  updateDashboard();
+}
+
+function setUtilBar(barId, pctId, pct) {
+  const bar = document.getElementById(barId);
+  const label = document.getElementById(pctId);
+  if (!bar || !label) return;
+  const clamped = clamp(pct, 0, 100);
+  bar.style.width = clamped + '%';
+  bar.style.background = barColor(pct);
+  label.textContent = pct + '%';
+}
+
+// ============ BUDGET ============
+function calcBudget() {
+  const assocRate = +document.getElementById('b-assoc-rate').value;
+  const mgrRate = +document.getElementById('b-mgr-rate').value;
+  const assocCount = +document.getElementById('b-assoc-count').value;
+  const mgrCount = +document.getElementById('b-mgr-count').value;
+  const shiftHrs = +document.getElementById('b-shift-hrs').value;
+  const opDays = +document.getElementById('b-op-days').value;
+  const otMult = +document.getElementById('b-ot-mult').value;
+  const otHrs = +document.getElementById('b-ot-hrs').value;
+  const benefits = +document.getElementById('b-benefits').value / 100;
+  const annualBudget = +document.getElementById('b-annual-budget').value;
+
+  const regularHrsWeek = shiftHrs * opDays;
+  const assocRegularWk = assocCount * assocRate * regularHrsWeek;
+  const mgrRegularWk = mgrCount * mgrRate * regularHrsWeek;
+  const assocOTWk = assocCount * assocRate * otMult * otHrs;
+  const mgrOTWk = mgrCount * mgrRate * otMult * otHrs;
+  const baseWeekly = assocRegularWk + mgrRegularWk + assocOTWk + mgrOTWk;
+  const benefitsWeekly = baseWeekly * benefits;
+  const totalWeekly = baseWeekly + benefitsWeekly;
+  const totalAnnual = totalWeekly * 52;
+
+  const budgetPct = clamp(Math.round((totalAnnual / annualBudget) * 100), 0, 150);
+  const variance = totalAnnual - annualBudget;
+
+  const kpiEl = document.getElementById('budget-kpis');
+  kpiEl.innerHTML =
+    kpiHtml('Weekly Labor Cost', fmtDollar(Math.round(totalWeekly)), 'neutral') +
+    kpiHtml('Annual Projection', fmtDollar(Math.round(totalAnnual / 1000000), 1) + 'M', variance > 0 ? 'bad' : 'good') +
+    kpiHtml('vs Budget', (variance >= 0 ? '+' : '') + fmtDollar(Math.round(variance / 1000)) + 'K', variance > 0 ? 'bad' : 'good') +
+    kpiHtml('Budget Used', budgetPct + '%', budgetPct > 100 ? 'bad' : budgetPct > 90 ? 'warn' : 'good');
+
+  // Breakdown
+  const bd = document.getElementById('cost-breakdown');
+  bd.innerHTML = [
+    ['Associate Regular Pay (wk)', fmtDollar(Math.round(assocRegularWk))],
+    ['Manager Regular Pay (wk)', fmtDollar(Math.round(mgrRegularWk))],
+    ['Associate Overtime (wk)', fmtDollar(Math.round(assocOTWk))],
+    ['Manager Overtime (wk)', fmtDollar(Math.round(mgrOTWk))],
+    ['Benefits Load (' + (benefits * 100).toFixed(0) + '%) (wk)', fmtDollar(Math.round(benefitsWeekly))],
+  ].map(([l, v]) => `<div class="cost-row"><span class="cost-label">${l}</span><span class="cost-value">${v}</span></div>`).join('')
+    + `<div class="cost-row" style="margin-top:0.5rem;"><span style="font-weight:700;">Total Weekly</span><span class="cost-total">${fmtDollar(Math.round(totalWeekly))}</span></div>`;
+
+  // Budget bar
+  const bb = document.getElementById('budget-bar');
+  const bbp = document.getElementById('budget-bar-pct');
+  const clamped = clamp(budgetPct, 0, 100);
+  bb.style.width = clamped + '%';
+  bb.style.background = budgetPct > 100 ? 'var(--red)' : budgetPct > 90 ? 'var(--orange)' : 'var(--green)';
+  bbp.textContent = budgetPct + '%';
+  const mid = document.getElementById('budget-mid-label');
+  const max = document.getElementById('budget-max-label');
+  if (mid) mid.textContent = fmtDollar(annualBudget / 2 / 1000000, 1) + 'M';
+  if (max) max.textContent = fmtDollar(annualBudget / 1000000, 1) + 'M';
+
+  // Alerts
+  let alertsHtml = '';
+  if (variance > 0) alertsHtml += alertHtml(`Over budget by ${fmtDollar(Math.round(variance / 1000))}K annually — review staffing levels or OT.`, 'red');
+  else if (budgetPct > 90) alertsHtml += alertHtml(`At ${budgetPct}% of annual budget — limited headroom.`, 'orange');
+  else alertsHtml += alertHtml(`On track — ${fmtDollar(Math.round(Math.abs(variance) / 1000))}K under annual budget.`, 'green');
+  document.getElementById('budget-alerts').innerHTML = alertsHtml;
+
+  // CPU
+  const dailyVol = +document.getElementById('daily-volume')?.value || 25000;
+  const opDaysYr = opDays * 52;
+  const cpu = dailyVol * opDaysYr > 0 ? totalAnnual / (dailyVol * opDaysYr) : 0;
+  document.getElementById('cpu-display').textContent = fmtDollar(cpu, 3) + ' / unit';
+
+  updateDashboard();
+}
+
+// ============ RENDER BARS ============
+function renderBars(containerId, bars) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const maxVal = Math.max(...bars.map(b => b.val), 1);
+  container.innerHTML = bars.map(b => {
+    const pct = clamp(Math.round((b.val / maxVal) * 100), 0, 100);
+    const color = b.pct !== undefined ? barColor(b.pct) : 'var(--accent)';
+    return `<div class="bar-row">
+      <div class="bar-label">${b.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color};">
+          <span>${b.display || b.val}</span>
+        </div>
+      </div>
+      <div class="bar-val">${b.display || fmt(b.val)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ DASHBOARD UPDATE ============
+function updateDashboard() {
+  // Pull values from other tabs
+  const numShifts = +document.getElementById('num-shifts')?.value || 2;
+  const shiftHrs = +document.getElementById('shift-hours')?.value || 10;
+  const dailyVol = +document.getElementById('daily-volume')?.value || 25000;
+  const prodRate = +(document.getElementById('weekly-prod-rate')?.value || 50);
+  const weeklyShiftHrs = +(document.getElementById('weekly-shift-hrs')?.value || 10);
+  const weeklyShifts = +(document.getElementById('weekly-shifts')?.value || 2);
+  const prodHrsPerDay = weeklyShiftHrs * weeklyShifts * 0.9;
+
+  // Weekly volume total
+  const totalWeeklyVol = state.weekly.reduce((s, d) => s + d.vol, 0);
+  const avgDailyVol = Math.round(totalWeeklyVol / 6);
+  const totalReqHC = state.weekly.reduce((s, d) => s + (d.vol > 0 ? Math.ceil(d.vol / (prodRate * prodHrsPerDay)) : 0), 0);
+  const totalPlanHC = state.weekly.reduce((s, d) => s + d.planned, 0);
+  const overallUtil = totalPlanHC > 0 ? Math.round((totalReqHC / totalPlanHC) * 100) : 0;
+
+  const kpiGrid = document.getElementById('kpi-grid');
+  kpiGrid.innerHTML =
+    kpiHtml('Weekly Volume', fmt(totalWeeklyVol), 'neutral', 'units') +
+    kpiHtml('Avg Daily Volume', fmt(avgDailyVol), 'info', 'units/day') +
+    kpiHtml('Total HC Planned', fmt(totalPlanHC), 'info', 'person-days') +
+    kpiHtml('HC Utilization', overallUtil + '%', overallUtil > 100 ? 'bad' : overallUtil > 80 ? 'good' : 'warn') +
+    kpiHtml('Daily Volume Target', fmt(dailyVol), 'neutral', 'shift plan');
+
+  // Alerts
+  let alertsHtml = '';
+  state.weekly.forEach(d => {
+    if (d.vol === 0) return;
+    const req = Math.ceil(d.vol / (prodRate * prodHrsPerDay));
+    const delta = d.planned - req;
+    if (delta < -10) alertsHtml += alertHtml(`${d.day}: Understaffed by ${Math.abs(delta)} associates (${fmt(d.vol)} units, need ${req} HC, have ${d.planned}).`, 'red');
+    else if (delta > 20) alertsHtml += alertHtml(`${d.day}: Overstaffed by ${delta} associates — opportunity to reduce labor cost.`, 'orange');
+  });
+  if (!alertsHtml) alertsHtml = alertHtml('No critical staffing alerts this week.', 'green');
+  document.getElementById('alert-zone').innerHTML = alertsHtml;
+
+  // Weekly bar chart
+  const maxVol = Math.max(...state.weekly.map(d => d.vol), 1);
+  renderBars('weekly-bar-chart', state.weekly.map(d => ({
+    label: d.day,
+    val: d.vol,
+    pct: Math.round((d.vol / maxVol) * 80),
+    display: fmt(d.vol)
+  })));
+
+  // Path bar chart (reuse shift path data)
+  const avgUph = state.paths.reduce((s, p) => s + (p.pct / 100) * p.uph, 0);
+  const effHrs = shiftHrs * 0.9 * 0.85;
+  const totalHCPerShift = avgUph > 0 ? Math.ceil((dailyVol / numShifts) / (effHrs * avgUph)) : 1;
+  renderBars('path-bar-chart', state.paths.map(p => {
+    const pathVol = (p.pct / 100) * dailyVol / numShifts;
+    const hc = p.uph > 0 ? Math.ceil(pathVol / (effHrs * p.uph)) : 0;
+    return { label: p.name, val: hc, pct: clamp(Math.round((hc / totalHCPerShift) * 80), 0, 100), display: hc + ' HC' };
+  }));
+
+  // Week summary grid
+  const weekGrid = document.getElementById('week-summary-grid');
+  weekGrid.innerHTML = state.weekly.map(d => {
+    const req = d.vol > 0 ? Math.ceil(d.vol / (prodRate * prodHrsPerDay)) : 0;
+    const delta = d.planned - req;
+    let statusHtml = d.vol === 0 ? '<span class="status-badge badge-orange">Dark</span>' : statusBadge(delta);
+    return `<div class="day-card">
+      <div class="day-name">${d.day}</div>
+      <div class="day-vol">${d.vol > 0 ? fmt(d.vol) : '—'}</div>
+      <div class="day-hc">${req > 0 ? `${d.planned}/${req} HC` : '—'}</div>
+      <div class="day-status">${statusHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ INIT ============
+function init() {
+  buildPathTable();
+  buildWeeklyInputs();
+  buildChannelTable();
+  calcShift();
+  calcWeekly();
+  calcCapacity();
+  calcBudget();
+}
+
+init();
+</script>
+</body>
+</html>
