@@ -1,12 +1,11 @@
 # dc-labor-planner
-This file contains the code for a Distribution Center Labor Planner developed to showcase my skill set for interviews and applications. Information and code added from the Command Line.
 DC Labor Planning Tool
 
 A full-stack, browser-based distribution center labor planning application built to model headcount requirements, capacity utilization, shift scheduling, and labor budget — in real time.
 
 Live Demo: [tinsgeo.github.io/dc-labor-planner](https://tinsgeo.github.io/dc-labor-planner)
 
----
+____________________________________________________________________________________________________________________________________________
 
 The Problem
 
@@ -14,7 +13,7 @@ Distribution center managers make staffing and capacity decisions daily — ofte
 
 This tool consolidates those decisions into a single, dynamic planning interface that recalculates in real time as inputs change.
 
----
+____________________________________________________________________________________________________________________________________________
 
 Features
 
@@ -43,7 +42,7 @@ Live Dashboard
 - Automated alerts for staffing gaps, capacity overloads, and budget overruns
 - Visual bar charts for volume distribution and process path utilization
 
----
+____________________________________________________________________________________________________________________________________________
 
 Tech Stack
 
@@ -52,7 +51,7 @@ Tech Stack
 | State Management | React Hooks (useState) |
 | Deployment | GitHub Pages |
 
----
+____________________________________________________________________________________________________________________________________________
 
 Why I Built This
 
@@ -60,7 +59,7 @@ I spent 8 years managing distribution center operations at Amazon — across rob
 
 It also gave me hands-on experience building a production-grade React application with dynamic state management, real-time computation, and a component-based UI — applying software engineering principles to a domain I know deeply.
 
----
+____________________________________________________________________________________________________________________________________________
 
 Getting Started
 
@@ -83,13 +82,13 @@ Run `npm audit` for details.
 
 Open [http://localhost:3000](http://localhost:3000) to run locally.
 
----
+____________________________________________________________________________________________________________________________________________
 
-## Screenshots
+Screenshots
 
-*(Add 1–2 screenshots of the dashboard and shift planning tabs here)*
+![Screenshot](dc-labor-planner-ss1.png)
 
----
+____________________________________________________________________________________________________________________________________________
 
 Future Improvements
 
@@ -98,7 +97,7 @@ Future Improvements
 - Azure integration for cloud-hosted data and multi-user access
 - Predictive headcount recommendations using time-series forecasting
 
----
+____________________________________________________________________________________________________________________________________________
 
 Author
 
