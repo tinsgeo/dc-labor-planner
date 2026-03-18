@@ -64,9 +64,13 @@ ________________________________________________________________________________
 Getting Started
 
 _bash_
+
 git clone https://github.com/tinsgeo/dc-labor-planner.git
+
 cd dc-labor-planner
+
 npm install
+
 npm start
 
 Open [http://localhost:3000](http://localhost:3000) to run locally.
