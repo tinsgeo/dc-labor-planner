@@ -55,7 +55,7 @@ ________________________________________________________________________________
 
 Why I Built This
 
-I spent 8 years managing distribution center operations at Amazon — across robotics fulfillment, last-mile delivery, and manufacturing. I built internal tools at Amazon (in VBA and SQL) that the project management team validated at .2M in annual savings. This project is a public, modern reimagining of that same problem: giving operations managers a real-time planning tool that replaces manual spreadsheet work.
+I spent 8 years managing distribution center operations at Amazon — across robotics fulfillment, last-mile delivery, and manufacturing. I built internal tools at Amazon (in VBA and SQL) that the project management team validated at 1.2M in annual savings. This project is a public, modern reimagining of that same problem: giving operations managers a real-time planning tool that replaces manual spreadsheet work.
 
 It also gave me hands-on experience building a production-grade React application with dynamic state management, real-time computation, and a component-based UI — applying software engineering principles to a domain I know deeply.
 
@@ -63,22 +63,11 @@ ________________________________________________________________________________
 
 Getting Started
 
-On branch main
-Your branch is up to date with 'origin/main'.
-
-nothing to commit, working tree clean
-
-up to date, audited 118 packages in 3s
-
-11 packages are looking for funding
-  run `npm fund` for details
-
-1 high severity vulnerability
-
-To address all issues, run:
-  npm audit fix
-
-Run `npm audit` for details.
+_bash_
+git clone https://github.com/tinsgeo/dc-labor-planner.git
+cd dc-labor-planner
+npm install
+npm start
 
 Open [http://localhost:3000](http://localhost:3000) to run locally.
 
